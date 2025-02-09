@@ -12,10 +12,20 @@
 5. 执行AutoMod.exe，程序会自动修补Mod。修补结束后，将CacheFiles文件夹复制回手机/模拟器的原路径中，覆盖原文件。
 ### 使用源代码
 1. 安装python，推荐3.8.10，记得把python加入系统路径；
-2. 克隆本项目 git clone https://github.com/HHEBL/CWCX_AutoMod.git ，得到CWCX_AutoMod文件夹。一般不需要安装第三方依赖；
-3. 将手机/模拟器中 ./android/data/com.tingzhou.cwcxtw.qooapp/files/yoo/ResPackage 路径下的CacheFiles和ManifestFiles文件复制出来，放在CWCX_AutoMod文件夹中；
-4. 挑选自己喜欢的Mod，将它们放在CWCX_AutoMod文件夹下的mod文件夹中；
-5. 在终端中使用命令 python main.py 执行程序，程序会自动修补Mod。修补结束后，将CacheFiles文件夹复制回手机/模拟器的原路径中，覆盖原文件。
+2. 克隆本项目：
+
+   ```powershell
+   git clone https://github.com/HHEBL/CWCX_AutoMod.git
+   ```
+   得到CWCX_AutoMod文件夹。一般不需要安装第三方依赖；
+4. 将手机/模拟器中 ./android/data/com.tingzhou.cwcxtw.qooapp/files/yoo/ResPackage 路径下的CacheFiles和ManifestFiles文件复制出来，放在CWCX_AutoMod文件夹中；
+5. 挑选自己喜欢的Mod，将它们放在CWCX_AutoMod文件夹下的mod文件夹中；
+6. 在终端中执行命令：
+
+   ```powershell
+   python main.py
+   ```
+   程序会自动修补Mod。修补结束后，将CacheFiles文件夹复制回手机/模拟器的原路径中，覆盖原文件。
 ## 有问题的Mod
 以下Mod存在一些问题：
 | 编号 | 存在问题 | 是否放入懒人包 |
