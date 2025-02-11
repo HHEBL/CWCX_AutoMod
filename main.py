@@ -1,8 +1,32 @@
-import binascii
 import os
 import re
+import json
 import shutil
 import struct
+import binascii
+
+
+# 映射关系存储文件路径
+MAPPING_FILE = './mappings.json'
+
+
+def load_mappings():
+    """
+    加载已存储的 cid 和 target_folder 的映射关系。
+    """
+    if not os.path.exists(MAPPING_FILE):
+        return {}
+    
+    with open(MAPPING_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def save_mappings(mapping):
+    """
+    将 cid 和 target_folder 的映射关系保存到文件。
+    """
+    with open(MAPPING_FILE, 'w', encoding='utf-8') as f:
+        json.dump(mapping, f, ensure_ascii=False, indent=4)
 
 
 def get_latest_file(folder, suffix, time_length=14):
@@ -153,6 +177,15 @@ def main():
     suf_pkg = '.pkg'
     suf_bytes = '.bytes'
 
+    # 加载已存储的 cid-target folder 映射关系
+    mappings = load_mappings()
+
+    # 记录新的 cid-target folder 映射关系
+    new_mappings = {}
+    
+    # 记录已访问过文件夹
+    folder_records = {}
+
     # 获取最新的ManifestFiles文件内容
     content = get_latest_file(manifest_folder, suf_bytes)
     if not content:
@@ -162,35 +195,74 @@ def main():
     # 遍历./mod路径下所有pkg文件
     for filename in os.listdir(mod_folder):
         if filename.endswith(suf_pkg):
+            # 去除文件后缀名.pkg
             cid = filename[:-len(suf_pkg)]
-            # 根据角色ID在ManifestFiles文件中查找对应的文件夹名
-            target_folder = extract_info(content, cid)
-            if target_folder:
-                print(f"编号{cid}的角色对应文件夹为：{target_folder}")
+            
+            # 先查找已存储的映射关系
+            target_folder = mappings.get(cid)
+            if not target_folder:
+                # 根据角色ID在ManifestFiles文件中查找对应的文件夹名
+                target_folder = extract_info(content, cid)
+                if target_folder:
+                    new_mappings[cid] = target_folder
+                else:
+                    print(f"未找到编号{cid}的相关信息或文件内容不符合预期。")
+                    continue
+            
+            print(f"编号{cid}的角色对应文件夹为：{target_folder}")
 
-                # 构建目标文件夹路径
-                target_path = os.path.join(cache_folder, target_folder[:2], target_folder)
+            # 构建目标文件夹路径
+            target_path = os.path.join(cache_folder, target_folder[:2], target_folder)
 
-                # 源文件路径
-                src_path = os.path.join(mod_folder, filename)
+            # 源文件路径
+            src_path = os.path.join(mod_folder, filename)
 
-                # 移动并重命名文件
-                copied_file_path = copy_and_rename_file(src_path, target_path)
-                if copied_file_path:
-                    # 获取文件大小并转换为十六进制字符串
-                    file_size = os.path.getsize(copied_file_path)
-                    hex_address = convert_size_to_hex(file_size)
-                    print(f"文件大小为{file_size}字节，转化为小端序十六进制是：{hex_address}")
+            # 移动并重命名文件
+            copied_file_path = copy_and_rename_file(src_path, target_path)
+            if copied_file_path:
+                # 获取文件大小并转换为十六进制字符串
+                file_size = os.path.getsize(copied_file_path)
+                hex_address = convert_size_to_hex(file_size)
+                print(f"文件大小为{file_size}字节，转化为小端序十六进制是：{hex_address}")
 
-                    # 构建 __info 文件路径
-                    info_path = os.path.join(target_path, "__info")
+                # 构建 __info 文件路径
+                info_path = os.path.join(target_path, "__info")
 
-                    # 更新 __info 文件
-                    update_info_file(info_path, hex_address)
-            else:
-                print(f"未找到编号{cid}的角色的相关信息或文件内容不符合预期。")
+                # 更新 __info 文件
+                update_info_file(info_path, hex_address)
 
+            # 记录 target_folder 及其前两个字符
+            prefix2 = target_folder[:2]
+            if prefix2 not in folder_records:
+                folder_records[prefix2] = []
+            folder_records[prefix2].append(target_folder)
+            
             print("")  # 每次处理的输出之间空一行，为了美观
+    
+    print("Mod修补完毕，正在清理非Mod文件...")
+    # 遍历 cache_folder 并删除未被记录的文件夹
+    for root, dirs, files in os.walk(cache_folder):
+        if len(root.split(os.sep)) - len(cache_folder.split(os.sep)) == 1:
+            # 当前目录是第一层子目录
+            current_dir = os.path.basename(root)
+            if current_dir in folder_records:
+                # 获取当前目录下的所有 target_folder
+                existing_folders = set(os.listdir(root))
+                recorded_folders = set(folder_records[current_dir])
+                folders_to_delete = existing_folders - recorded_folders
+                
+                for folder in folders_to_delete:
+                    folder_path = os.path.join(root, folder)
+                    shutil.rmtree(folder_path)
+            else:
+                # 如果当前目录没有记录的目标文件夹，删除整个目录
+                shutil.rmtree(root)
+    
+    # 在所有任务完成后，将新的映射关系一次性写入到文件
+    if new_mappings:
+        mappings.update(new_mappings)
+        save_mappings(mappings)
+        print("新的映射关系已保存到文件。")
     
     # 提示用户按下回车键退出
     input("按下回车键退出...")
