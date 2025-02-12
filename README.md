@@ -6,7 +6,7 @@
 可以在右侧release中直接下载package.zip文件，将解压后得到的CacheFiles文件夹放到手机/模拟器的 ./android/data/com.tingzhou.cwcxtw.qooapp/files/yoo/ResPackage 路径下。
 ### 使用可执行文件（推荐给想自己挑选Mod的人）
 1. 在右侧release中下载最新版压缩包；
-2. 解压压缩包，得到一个可执行文件AutoMod.exe和一个空文件夹mod；
+2. 解压压缩包，得到一个可执行文件AutoMod.exe、一个映射缓存文件mappings.json和一个空文件夹mod；
 3. 将手机/模拟器中 ./android/data/com.tingzhou.cwcxtw.qooapp/files/yoo/ResPackage 路径下的CacheFiles和ManifestFiles文件复制出来，与AutoMod.exe放在同文件夹下；
 4. 挑选自己喜欢的Mod，将它们放在mod文件夹中；
 5. 执行AutoMod.exe，程序会自动修补Mod，并清理无用文件。修补结束后，将CacheFiles文件夹复制回手机/模拟器的原路径中，覆盖原文件。
