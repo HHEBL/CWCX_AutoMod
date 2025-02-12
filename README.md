@@ -3,7 +3,7 @@
 某游戏的Mod自动修复工具。你只需要将游戏原本的CacheFiles和ManifestFiles文件复制过来，挑选你喜欢的Mod放入mod文件夹中，然后执行程序一键修补。
 ## 使用说明
 ### 懒人包（推荐）
-可以在右侧release中直接下载package.zip文件，将解压后得到的CacheFiles文件夹放到手机/模拟器的 ./android/data/com.tingzhou.cwcxtw.qooapp/files/yoo/ResPackage 路径下。
+可以在右侧release中直接下载Full Package.zip文件，将解压后得到的CacheFiles文件夹放到手机/模拟器的 ./android/data/com.tingzhou.cwcxtw.qooapp/files/yoo/ResPackage 路径下。
 ### 使用可执行文件（推荐给想自己挑选Mod的人）
 1. 在右侧release中下载最新版压缩包；
 2. 解压压缩包，得到一个可执行文件AutoMod.exe、一个映射缓存文件mappings.json和一个空文件夹mod；
